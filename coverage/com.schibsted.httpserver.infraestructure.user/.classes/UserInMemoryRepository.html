@@ -1,0 +1,155 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: UserInMemoryRepository</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.schibsted.httpserver.infraestructure.user</a> ]
+</div>
+
+<h1>Coverage Summary for Class: UserInMemoryRepository (com.schibsted.httpserver.infraestructure.user)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">UserInMemoryRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    71,4%
+  </span>
+  <span class="absValue">
+    (5/ 7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    95,8%
+  </span>
+  <span class="absValue">
+    (46/ 48)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.schibsted.httpserver.infraestructure.user;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.schibsted.httpserver.domain.role.Role;
+<i>4</i>&nbsp;import com.schibsted.httpserver.domain.user.Administrator;
+<i>5</i>&nbsp;import com.schibsted.httpserver.domain.user.User;
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;import java.util.List;
+<i>8</i>&nbsp;import java.util.concurrent.ConcurrentHashMap;
+<i>9</i>&nbsp;import java.util.concurrent.atomic.AtomicInteger;
+<i>10</i>&nbsp;import java.util.regex.Pattern;
+<i>11</i>&nbsp;import java.util.stream.Collectors;
+<i>12</i>&nbsp;
+<i>13</i>&nbsp;public class UserInMemoryRepository {
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;    public static final String SEPARATOR_ROLE = &quot;,&quot;;
+<i>16</i>&nbsp;
+<b class="fc"><i>17</i>&nbsp;    private final AtomicInteger countUserRepository = new AtomicInteger(0);</b>
+<b class="fc"><i>18</i>&nbsp;    private final ConcurrentHashMap&lt;Integer, User&gt; userConcurrentHashMap = new ConcurrentHashMap&lt;&gt;();</b>
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;    public ConcurrentHashMap&lt;Integer, User&gt; getUserConcurrentHashMap() {
+<b class="fc"><i>21</i>&nbsp;        return userConcurrentHashMap;</b>
+<i>22</i>&nbsp;    }
+<i>23</i>&nbsp;
+<i>24</i>&nbsp;    public AtomicInteger getCountUserRepository() {
+<b class="fc"><i>25</i>&nbsp;        return countUserRepository;</b>
+<b class="nc"><i>26</i>&nbsp;    }</b>
+<i>27</i>&nbsp;
+<b class="fc"><i>28</i>&nbsp;    public UserInMemoryRepository() {</b>
+<b class="fc"><i>29</i>&nbsp;        InitializeUser();</b>
+<b class="fc"><i>30</i>&nbsp;    }</b>
+<i>31</i>&nbsp;
+<i>32</i>&nbsp;    private void InitializeUser() {
+<b class="fc"><i>33</i>&nbsp;        List&lt;Role&gt; roleList = Pattern.compile(SEPARATOR_ROLE)</b>
+<b class="fc"><i>34</i>&nbsp;                .splitAsStream(Role.PAGE_1.toString())</b>
+<b class="fc"><i>35</i>&nbsp;                .map(this::getRole)</b>
+<b class="fc"><i>36</i>&nbsp;                .collect(Collectors.toList());</b>
+<b class="fc"><i>37</i>&nbsp;        User user1 = new User(countUserRepository.incrementAndGet(), &quot;user1&quot;, &quot;1234&quot;, roleList);</b>
+<b class="fc"><i>38</i>&nbsp;        userConcurrentHashMap.put(countUserRepository.get(), user1);</b>
+<b class="fc"><i>39</i>&nbsp;        roleList = Pattern.compile(SEPARATOR_ROLE)</b>
+<b class="fc"><i>40</i>&nbsp;                .splitAsStream(Role.ADMIN.toString())</b>
+<b class="fc"><i>41</i>&nbsp;                .map(this::getRole)</b>
+<b class="fc"><i>42</i>&nbsp;                .collect(Collectors.toList());</b>
+<b class="fc"><i>43</i>&nbsp;        User user2 = new Administrator(countUserRepository.incrementAndGet(), &quot;user2&quot;, &quot;1234&quot;, roleList);</b>
+<b class="fc"><i>44</i>&nbsp;        userConcurrentHashMap.put(countUserRepository.get(), user2);</b>
+<b class="fc"><i>45</i>&nbsp;        roleList = Pattern.compile(SEPARATOR_ROLE)</b>
+<b class="fc"><i>46</i>&nbsp;                .splitAsStream(Role.PAGE_1.toString() + SEPARATOR_ROLE + Role.PAGE_2.toString())</b>
+<b class="fc"><i>47</i>&nbsp;                .map(this::getRole)</b>
+<b class="fc"><i>48</i>&nbsp;                .collect(Collectors.toList());</b>
+<b class="fc"><i>49</i>&nbsp;        User user3 = new User(countUserRepository.incrementAndGet(), &quot;user3&quot;, &quot;1234&quot;, roleList);</b>
+<b class="fc"><i>50</i>&nbsp;        userConcurrentHashMap.put(countUserRepository.get(), user3);</b>
+<b class="fc"><i>51</i>&nbsp;    }</b>
+<b class="fc"><i>52</i>&nbsp;</b>
+<b class="fc"><i>53</i>&nbsp;    private Role getRole(String role) {</b>
+<b class="fc"><i>54</i>&nbsp;        Role result = Role.NONE;</b>
+<b class="fc"><i>55</i>&nbsp;        switch (role.toUpperCase()) {</b>
+<b class="fc"><i>56</i>&nbsp;            case &quot;ADMIN&quot;:</b>
+<b class="fc"><i>57</i>&nbsp;                result = Role.ADMIN;</b>
+<b class="fc"><i>58</i>&nbsp;                break;</b>
+<b class="fc"><i>59</i>&nbsp;            case &quot;PAGE_1&quot;:</b>
+<b class="fc"><i>60</i>&nbsp;                result = Role.PAGE_1;</b>
+<b class="fc"><i>61</i>&nbsp;                break;</b>
+<b class="fc"><i>62</i>&nbsp;            case &quot;PAGE_2&quot;:</b>
+<b class="fc"><i>63</i>&nbsp;                result = Role.PAGE_2;</b>
+<b class="fc"><i>64</i>&nbsp;                break;</b>
+<b class="fc"><i>65</i>&nbsp;            case &quot;PAGE_3&quot;:</b>
+<b class="fc"><i>66</i>&nbsp;                result = Role.PAGE_3;</b>
+<i>67</i>&nbsp;                break;
+<b class="fc"><i>68</i>&nbsp;        }</b>
+<b class="fc"><i>69</i>&nbsp;        return result;</b>
+<i>70</i>&nbsp;    }
+<b class="fc"><i>71</i>&nbsp;</b>
+<b class="fc"><i>72</i>&nbsp;}</b>
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2017-05-19 14:56</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,98 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: ResultError403</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.schibsted.httpserver.domain.result</a> ]
+</div>
+
+<h1>Coverage Summary for Class: ResultError403 (com.schibsted.httpserver.domain.result)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ResultError403</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.schibsted.httpserver.domain.result;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.schibsted.httpserver.domain.request.Request;
+<i>4</i>&nbsp;
+<i>5</i>&nbsp;public class ResultError403 extends ResultError {
+<i>6</i>&nbsp;
+<i>7</i>&nbsp;    public static final int STATUS = Request.HTTP_FORBIDDEN;
+<i>8</i>&nbsp;    public static final String TITLE = &quot;Forbidden&quot;;
+<i>9</i>&nbsp;    public static final String DESCRIPTION = &quot;The server understood the request but refuses to authorize it&quot;;
+<i>10</i>&nbsp;
+<i>11</i>&nbsp;    public ResultError403() {
+<b class="fc"><i>12</i>&nbsp;        super(STATUS, TITLE, DESCRIPTION);</b>
+<b class="fc"><i>13</i>&nbsp;    }</b>
+<i>14</i>&nbsp;
+<i>15</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2017-05-19 14:56</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,227 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: HttpHandlerApi</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.schibsted.httpserver.infraestructure.handler</a> ]
+</div>
+
+<h1>Coverage Summary for Class: HttpHandlerApi (com.schibsted.httpserver.infraestructure.handler)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HttpHandlerApi</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/ 5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    86,4%
+  </span>
+  <span class="absValue">
+    (95/ 110)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.schibsted.httpserver.infraestructure.handler;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.schibsted.httpserver.domain.request.Request;
+<i>4</i>&nbsp;import com.schibsted.httpserver.domain.result.*;
+<i>5</i>&nbsp;import com.schibsted.httpserver.domain.user.User;
+<i>6</i>&nbsp;import com.schibsted.httpserver.infraestructure.user.AdministratorServiceImpl;
+<i>7</i>&nbsp;import com.schibsted.httpserver.infraestructure.user.UserInMemoryRepository;
+<i>8</i>&nbsp;import com.schibsted.httpserver.infraestructure.user.UserServiceImpl;
+<i>9</i>&nbsp;import com.sun.net.httpserver.HttpExchange;
+<i>10</i>&nbsp;import java.io.BufferedReader;
+<i>11</i>&nbsp;import java.io.IOException;
+<i>12</i>&nbsp;import java.io.InputStream;
+<i>13</i>&nbsp;import java.io.InputStreamReader;
+<i>14</i>&nbsp;import java.util.Collection;
+<i>15</i>&nbsp;import java.util.HashMap;
+<i>16</i>&nbsp;import java.util.Map;
+<i>17</i>&nbsp;import java.util.Optional;
+<i>18</i>&nbsp;import java.util.regex.Matcher;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;public class HttpHandlerApi extends HttpHandlerService {
+<i>21</i>&nbsp;
+<i>22</i>&nbsp;    public HttpHandlerApi(UserInMemoryRepository userRepository) {
+<b class="fc"><i>23</i>&nbsp;        super(userRepository);</b>
+<b class="fc"><i>24</i>&nbsp;    }</b>
+<b class="fc"><i>25</i>&nbsp;</b>
+<i>26</i>&nbsp;    @Override
+<i>27</i>&nbsp;    public void handle(HttpExchange httpExchange) throws IOException {
+<b class="fc"><i>28</i>&nbsp;        ResultError resultError;</b>
+<b class="fc"><i>29</i>&nbsp;        String userName = httpExchange.getPrincipal().getUsername();</b>
+<b class="fc"><i>30</i>&nbsp;        String requestMethod = httpExchange.getRequestMethod();</b>
+<b class="fc"><i>31</i>&nbsp;        String page = httpExchange.getRequestURI().getPath();</b>
+<i>32</i>&nbsp;
+<b class="fc"><i>33</i>&nbsp;        AdministratorServiceImpl administratorService = null;</b>
+<b class="fc"><i>34</i>&nbsp;        UserServiceImpl userServiceImpl = new UserServiceImpl(getUserRepository());</b>
+<b class="fc"><i>35</i>&nbsp;        Optional&lt;User&gt; user = userServiceImpl.getUserByName(userName);</b>
+<b class="fc"><i>36</i>&nbsp;        if (user.isPresent()) {</b>
+<b class="fc"><i>37</i>&nbsp;            if (user.get().isAdmin()) administratorService = new AdministratorServiceImpl(getUserRepository());</b>
+<b class="fc"><i>38</i>&nbsp;        }</b>
+<b class="fc"><i>39</i>&nbsp;</b>
+<b class="fc"><i>40</i>&nbsp;        Optional&lt;Integer&gt; id = getId(page);</b>
+<b class="fc"><i>41</i>&nbsp;        switch (requestMethod) {</b>
+<b class="fc"><i>42</i>&nbsp;            case Request.REQUEST_METHOD_GET:</b>
+<b class="fc"><i>43</i>&nbsp;                if (id.isPresent()) {</b>
+<b class="fc"><i>44</i>&nbsp;                    if (id.get() &gt; 0) {</b>
+<b class="fc"><i>45</i>&nbsp;                        Optional&lt;User&gt; userOptional = user.get().isAdmin() ? administratorService.getUserById(id.get()) : userServiceImpl.getUserById(id.get());</b>
+<b class="fc"><i>46</i>&nbsp;                        if (userOptional.isPresent()) {</b>
+<b class="fc"><i>47</i>&nbsp;                            setViewResponse(httpExchange, Request.HTTP_OK, userOptional.get());</b>
+<b class="fc"><i>48</i>&nbsp;                        } else {</b>
+<b class="fc"><i>49</i>&nbsp;                            resultError = new ResultError204();</b>
+<b class="fc"><i>50</i>&nbsp;                            setViewResponse(httpExchange, resultError.getStatus(), resultError.getTitle(), resultError.getDescription());</b>
+<b class="nc"><i>51</i>&nbsp;                        }</b>
+<b class="fc"><i>52</i>&nbsp;                    } else if (id.get() == 0) {</b>
+<b class="fc"><i>53</i>&nbsp;                        Collection&lt;User&gt; json = user.get().isAdmin() ? administratorService.getUsers() : userServiceImpl.getUsers();</b>
+<b class="fc"><i>54</i>&nbsp;                        setViewResponse(httpExchange, Request.HTTP_OK, json);</b>
+<b class="fc"><i>55</i>&nbsp;                    }</b>
+<b class="nc"><i>56</i>&nbsp;                } else {</b>
+<b class="fc"><i>57</i>&nbsp;                    resultError = new ResultError400();</b>
+<b class="fc"><i>58</i>&nbsp;                    setViewResponse(httpExchange, resultError.getStatus(), resultError.getTitle(), resultError.getDescription());</b>
+<b class="fc"><i>59</i>&nbsp;                }</b>
+<b class="fc"><i>60</i>&nbsp;                break;</b>
+<b class="nc"><i>61</i>&nbsp;            case Request.REQUEST_METHOD_POST:</b>
+<b class="fc"><i>62</i>&nbsp;                if (id.isPresent()) {</b>
+<b class="fc"><i>63</i>&nbsp;                    if (id.get() &gt; 0) {</b>
+<i>64</i>&nbsp;                        Optional&lt;User&gt; userOptional;
+<b class="fc"><i>65</i>&nbsp;                        if (user.get().isAdmin()) {</b>
+<b class="fc"><i>66</i>&nbsp;                            Map&lt;String, String&gt; postQueryMap = getPostQueryMap(getPostAsString(httpExchange.getRequestBody()));</b>
+<b class="fc"><i>67</i>&nbsp;                            userOptional = administratorService.updateUser(id.get(), postQueryMap);</b>
+<b class="fc"><i>68</i>&nbsp;                            if (userOptional.isPresent()) {</b>
+<b class="fc"><i>69</i>&nbsp;                                setViewResponse(httpExchange, Request.HTTP_OK, userOptional.get());</b>
+<b class="fc"><i>70</i>&nbsp;                            } else {</b>
+<b class="fc"><i>71</i>&nbsp;                                resultError = new ResultError204();</b>
+<b class="fc"><i>72</i>&nbsp;                                setViewResponse(httpExchange, resultError.getStatus(), resultError.getTitle(), resultError.getDescription());</b>
+<b class="fc"><i>73</i>&nbsp;                            }</b>
+<b class="fc"><i>74</i>&nbsp;                        } else {</b>
+<b class="fc"><i>75</i>&nbsp;                            resultError = new ResultError403();</b>
+<b class="fc"><i>76</i>&nbsp;                            setViewResponse(httpExchange, resultError.getStatus(), resultError.getTitle(), resultError.getDescription());</b>
+<b class="nc"><i>77</i>&nbsp;                        }</b>
+<b class="fc"><i>78</i>&nbsp;                    } else if (id.get() == 0) {</b>
+<b class="fc"><i>79</i>&nbsp;                        Optional&lt;User&gt; userOptional;</b>
+<b class="fc"><i>80</i>&nbsp;                        if (user.get().isAdmin()) {</b>
+<b class="fc"><i>81</i>&nbsp;                            Map&lt;String, String&gt; postQueryMap = getPostQueryMap(getPostAsString(httpExchange.getRequestBody()));</b>
+<b class="fc"><i>82</i>&nbsp;                            userOptional = administratorService.addUser(postQueryMap);</b>
+<b class="fc"><i>83</i>&nbsp;                            if (userOptional.isPresent())</b>
+<b class="fc"><i>84</i>&nbsp;                                setViewResponse(httpExchange, Request.HTTP_CREATED, userOptional.get());</b>
+<b class="nc"><i>85</i>&nbsp;                            else {</b>
+<b class="nc"><i>86</i>&nbsp;                                resultError = new ResultError400();</b>
+<b class="nc"><i>87</i>&nbsp;                                setViewResponse(httpExchange, resultError.getStatus(), resultError.getTitle(), resultError.getDescription());</b>
+<b class="nc"><i>88</i>&nbsp;                            }</b>
+<b class="fc"><i>89</i>&nbsp;                        } else {</b>
+<b class="fc"><i>90</i>&nbsp;                            resultError = new ResultError403();</b>
+<b class="fc"><i>91</i>&nbsp;                            setViewResponse(httpExchange, resultError.getStatus(), resultError.getTitle(), resultError.getDescription());</b>
+<b class="nc"><i>92</i>&nbsp;                        }</b>
+<i>93</i>&nbsp;                    }
+<b class="nc"><i>94</i>&nbsp;                } else {</b>
+<b class="fc"><i>95</i>&nbsp;                    resultError = new ResultError400();</b>
+<b class="fc"><i>96</i>&nbsp;                    setViewResponse(httpExchange, resultError.getStatus(), resultError.getTitle(), resultError.getDescription());</b>
+<i>97</i>&nbsp;                }
+<b class="fc"><i>98</i>&nbsp;                break;</b>
+<b class="nc"><i>99</i>&nbsp;            default:</b>
+<b class="fc"><i>100</i>&nbsp;                resultError = new ResultError500();</b>
+<b class="fc"><i>101</i>&nbsp;                setViewResponse(httpExchange, resultError.getStatus(), resultError.getTitle(), resultError.getDescription());</b>
+<b class="nc"><i>102</i>&nbsp;                break;</b>
+<b class="nc"><i>103</i>&nbsp;        }</b>
+<b class="fc"><i>104</i>&nbsp;    }</b>
+<b class="nc"><i>105</i>&nbsp;</b>
+<i>106</i>&nbsp;    private static Map&lt;String, String&gt; getPostQueryMap(String post) {
+<b class="fc"><i>107</i>&nbsp;        String[] params = post.split(&quot;&amp;&quot;);</b>
+<b class="fc"><i>108</i>&nbsp;        Map&lt;String, String&gt; map = new HashMap&lt;&gt;();</b>
+<b class="fc"><i>109</i>&nbsp;        for (String param : params) {</b>
+<b class="fc"><i>110</i>&nbsp;            String name = param.split(&quot;=&quot;)[0];</b>
+<b class="fc"><i>111</i>&nbsp;            String value = param.split(&quot;=&quot;)[1];</b>
+<b class="fc"><i>112</i>&nbsp;            map.put(name, value);</b>
+<b class="fc"><i>113</i>&nbsp;        }</b>
+<b class="fc"><i>114</i>&nbsp;        return map;</b>
+<b class="fc"><i>115</i>&nbsp;    }</b>
+<b class="fc"><i>116</i>&nbsp;</b>
+<b class="fc"><i>117</i>&nbsp;    private String getPostAsString(InputStream inputStream) throws IOException {</b>
+<b class="fc"><i>118</i>&nbsp;        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));</b>
+<b class="fc"><i>119</i>&nbsp;        StringBuilder sb = new StringBuilder();</b>
+<b class="fc"><i>120</i>&nbsp;        String line;</b>
+<b class="fc"><i>121</i>&nbsp;        while ((line = br.readLine()) != null) {</b>
+<b class="fc"><i>122</i>&nbsp;            sb.append(line);</b>
+<b class="nc"><i>123</i>&nbsp;        }</b>
+<b class="fc"><i>124</i>&nbsp;        return sb.toString();</b>
+<b class="fc"><i>125</i>&nbsp;    }</b>
+<i>126</i>&nbsp;
+<b class="fc"><i>127</i>&nbsp;    private Optional&lt;Integer&gt; getId(String page) {</b>
+<b class="fc"><i>128</i>&nbsp;        Matcher matcher = Request.PATTERN_API.matcher(page);</b>
+<b class="fc"><i>129</i>&nbsp;        if (matcher.find()) {</b>
+<b class="fc"><i>130</i>&nbsp;            try {</b>
+<b class="fc"><i>131</i>&nbsp;                return Optional.of(Integer.parseInt(matcher.group(1)));</b>
+<b class="fc"><i>132</i>&nbsp;            } catch (NumberFormatException e) {</b>
+<b class="fc"><i>133</i>&nbsp;                return Optional.empty();</b>
+<b class="fc"><i>134</i>&nbsp;            }</b>
+<b class="fc"><i>135</i>&nbsp;        } else {</b>
+<b class="fc"><i>136</i>&nbsp;            return Optional.of(0);</b>
+<b class="fc"><i>137</i>&nbsp;        }</b>
+<b class="fc"><i>138</i>&nbsp;    }</b>
+<b class="fc"><i>139</i>&nbsp;</b>
+<i>140</i>&nbsp;}
+<i>141</i>&nbsp;
+<b class="fc"><i>142</i>&nbsp;</b>
+<i>143</i>&nbsp;
+<i>144</i>&nbsp;
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2017-05-19 14:56</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,133 @@
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html id="htmlId">
+<head>
+  <title>Coverage Report :: HttpHandlerPage</title>
+  <style type="text/css">
+    @import "../../.css/coverage.css";
+  </style>
+</head>
+
+<body>
+<div class="header"></div>
+
+<div class="content">
+<div class="breadCrumbs">
+    [ <a href="../../index.html">all classes</a> ]
+    [ <a href="../index.html">com.schibsted.httpserver.infraestructure.handler</a> ]
+</div>
+
+<h1>Coverage Summary for Class: HttpHandlerPage (com.schibsted.httpserver.infraestructure.handler)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">HttpHandlerPage</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/ 1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (2/ 2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    75%
+  </span>
+  <span class="absValue">
+    (24/ 32)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<div class="sourceCode"><i>1</i>&nbsp;package com.schibsted.httpserver.infraestructure.handler;
+<i>2</i>&nbsp;
+<i>3</i>&nbsp;import com.schibsted.httpserver.domain.request.Request;
+<i>4</i>&nbsp;import com.schibsted.httpserver.domain.result.ResultError;
+<i>5</i>&nbsp;import com.schibsted.httpserver.domain.result.ResultError403;
+<i>6</i>&nbsp;import com.schibsted.httpserver.domain.role.Role;
+<i>7</i>&nbsp;import com.schibsted.httpserver.domain.user.User;
+<i>8</i>&nbsp;import com.schibsted.httpserver.infraestructure.user.AdministratorServiceImpl;
+<i>9</i>&nbsp;import com.schibsted.httpserver.infraestructure.user.UserInMemoryRepository;
+<i>10</i>&nbsp;import com.schibsted.httpserver.infraestructure.user.UserServiceImpl;
+<i>11</i>&nbsp;import com.sun.net.httpserver.HttpExchange;
+<i>12</i>&nbsp;import org.apache.commons.lang3.StringUtils;
+<i>13</i>&nbsp;import java.io.IOException;
+<i>14</i>&nbsp;import java.util.Optional;
+<i>15</i>&nbsp;
+<i>16</i>&nbsp;public class HttpHandlerPage extends HttpHandlerService {
+<i>17</i>&nbsp;
+<i>18</i>&nbsp;    private final Role role;
+<i>19</i>&nbsp;
+<i>20</i>&nbsp;    public HttpHandlerPage(UserInMemoryRepository userRepository, Role role) {
+<b class="fc"><i>21</i>&nbsp;        super(userRepository);</b>
+<b class="fc"><i>22</i>&nbsp;        this.role = role;</b>
+<b class="fc"><i>23</i>&nbsp;    }</b>
+<b class="fc"><i>24</i>&nbsp;</b>
+<b class="fc"><i>25</i>&nbsp;    @Override</b>
+<b class="fc"><i>26</i>&nbsp;    public void handle(HttpExchange httpExchange) throws IOException {</b>
+<b class="fc"><i>27</i>&nbsp;        ResultError resultError = null;</b>
+<b class="fc"><i>28</i>&nbsp;        String page = Optional.of(StringUtils.replaceAll(httpExchange.getRequestURI().getPath(), Request.PREFIX_PATTERN_PAGE, &quot;&quot;) + &quot;.html&quot;).orElse(&quot;index.html&quot;);</b>
+<b class="fc"><i>29</i>&nbsp;        String description = &quot;&quot;;</b>
+<b class="fc"><i>30</i>&nbsp;        if (role != Role.NONE) {</b>
+<b class="fc"><i>31</i>&nbsp;            String userName = httpExchange.getPrincipal().getUsername();</b>
+<b class="fc"><i>32</i>&nbsp;            UserServiceImpl userServiceImpl = new UserServiceImpl(getUserRepository());</b>
+<b class="fc"><i>33</i>&nbsp;            AdministratorServiceImpl administratorService = null;</b>
+<b class="fc"><i>34</i>&nbsp;            Optional&lt;User&gt; user = userServiceImpl.getUserByName(userName);</b>
+<b class="fc"><i>35</i>&nbsp;            if (user.isPresent()) {</b>
+<b class="fc"><i>36</i>&nbsp;                if (user.get().isAdmin()) administratorService = new AdministratorServiceImpl(getUserRepository());</b>
+<b class="nc"><i>37</i>&nbsp;            }</b>
+<b class="fc"><i>38</i>&nbsp;            Boolean isUserPermissions = user.get().isAdmin() ? administratorService.isUserPermissions(userName, role) : userServiceImpl.isUserPermissions(userName, role);</b>
+<b class="fc"><i>39</i>&nbsp;            if (isUserPermissions) {</b>
+<b class="fc"><i>40</i>&nbsp;                description = &quot;Hello &quot; + userName;</b>
+<b class="fc"><i>41</i>&nbsp;                setViewPage(httpExchange, Request.HTTP_OK, &quot;&quot;, description, page);</b>
+<b class="nc"><i>42</i>&nbsp;            } else {</b>
+<b class="fc"><i>43</i>&nbsp;                resultError = new ResultError403();</b>
+<b class="fc"><i>44</i>&nbsp;                setViewPage(httpExchange, resultError.getStatus(), resultError.getTitle(), resultError.getDescription(), &quot;error.html&quot;);</b>
+<b class="nc"><i>45</i>&nbsp;            }</b>
+<b class="nc"><i>46</i>&nbsp;        }</b>
+<b class="fc"><i>47</i>&nbsp;        if (resultError == null) setViewPage(httpExchange, Request.HTTP_OK, &quot;&quot;, description, page);</b>
+<b class="fc"><i>48</i>&nbsp;    }</b>
+<b class="nc"><i>49</i>&nbsp;</b>
+<i>50</i>&nbsp;}
+</div>
+</div>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2017-05-19 14:56</div>
+</div>
+</body>
+</html>
