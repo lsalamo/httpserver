@@ -19,12 +19,11 @@ If the application httpserver is executed correctly must to show the message sho
 ```
 Server is running on http://localhost:8000/app/index
 ```
-**2.** Go to browser and view the next url to check that the server is running
-If you want to see this in action, check out [localhost](http://localhost:8000/app/index)
+**2.** Go to browser and view the next url to check that the server is running. If you want to see this in action, check out [localhost](http://localhost:8000/app/index)
 
 ## How does it work?
 
-By default, he user repository will create three new users with their roles when you start the application.
+By default, user repository will create three new users with their roles when you start the application.
 
 | Page | Username | Password | Role |
 | --- | --- | --- | --- |
