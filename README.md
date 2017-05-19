@@ -1,4 +1,4 @@
-# java-httpserver
+# httpserver
 Learning how to works a server with com.sun.net.httpserver
 
 ## Requires
@@ -11,7 +11,7 @@ Learning how to works a server with com.sun.net.httpserver
 **1.** Clone, compile, and execute the application
 ```
 $ git clone https://github.com/lsalamo/httpserver.git
-$ cd java-httpserver
+$ cd httpserver
 $ gradle buildJar
 $ java -jar build/libs/httpserver-1.0.jar
 ```
